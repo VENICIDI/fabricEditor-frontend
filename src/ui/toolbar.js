@@ -22,6 +22,13 @@ export function createToolbar({ canvas, commandManager, jsonModal }) {
   const btnExport = mustGetEl('btnExport');
   const btnImport = mustGetEl('btnImport');
 
+  const btnSelectMode = mustGetEl('btnSelectMode');
+  const btnBrush = mustGetEl('btnBrush');
+  const btnEraser = mustGetEl('btnEraser');
+  const brushColor = mustGetEl('brushColor');
+  const brushWidth = mustGetEl('brushWidth');
+  const brushOpacity = mustGetEl('brushOpacity');
+
   function getSelectedTargets() {
     const active = canvas.getActiveObject();
     if (!active) return [];
@@ -37,6 +44,53 @@ export function createToolbar({ canvas, commandManager, jsonModal }) {
   btnRect.addEventListener('click', () => addObject(createRect()));
   btnCircle.addEventListener('click', () => addObject(createCircle()));
   btnText.addEventListener('click', () => addObject(createText()));
+
+  function getDrawingController() {
+    return canvas.__drawing;
+  }
+
+  function readBrushSettingsFromUi() {
+    const color = brushColor.value;
+    const width = Number(brushWidth.value);
+    const opacity = Number(brushOpacity.value);
+    return {
+      color,
+      width: Number.isFinite(width) ? width : 4,
+      opacity: Number.isFinite(opacity) ? opacity : 1,
+    };
+  }
+
+  function syncBrushSettingsToCanvas() {
+    const drawing = getDrawingController();
+    if (!drawing) return;
+    drawing.setBrushSettings(readBrushSettingsFromUi());
+  }
+
+  btnSelectMode.addEventListener('click', () => {
+    const drawing = getDrawingController();
+    if (!drawing) return;
+    drawing.setDrawingMode(false);
+  });
+
+  btnBrush.addEventListener('click', () => {
+    const drawing = getDrawingController();
+    if (!drawing) return;
+    drawing.setTool('brush');
+    syncBrushSettingsToCanvas();
+    drawing.setDrawingMode(true);
+  });
+
+  btnEraser.addEventListener('click', () => {
+    const drawing = getDrawingController();
+    if (!drawing) return;
+    drawing.setTool('eraser');
+    syncBrushSettingsToCanvas();
+    drawing.setDrawingMode(true);
+  });
+
+  brushColor.addEventListener('input', () => syncBrushSettingsToCanvas());
+  brushWidth.addEventListener('input', () => syncBrushSettingsToCanvas());
+  brushOpacity.addEventListener('input', () => syncBrushSettingsToCanvas());
 
   btnDelete.addEventListener('click', () => {
     const targets = getSelectedTargets();

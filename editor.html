@@ -15,6 +15,23 @@
           <button class="primary" id="btnCircle">圆形</button>
           <button class="primary" id="btnText">文本</button>
 
+          <button id="btnSelectMode">选择</button>
+          <button id="btnBrush">画笔</button>
+          <button id="btnEraser">橡皮擦</button>
+
+          <label style="display:flex; align-items:center; gap:6px;">
+            <span style="font-size:12px; color:#374151;">颜色</span>
+            <input id="brushColor" type="color" value="#111111" />
+          </label>
+          <label style="display:flex; align-items:center; gap:6px;">
+            <span style="font-size:12px; color:#374151;">线宽</span>
+            <input id="brushWidth" type="number" min="1" step="1" value="4" style="width:72px" />
+          </label>
+          <label style="display:flex; align-items:center; gap:6px;">
+            <span style="font-size:12px; color:#374151;">透明度</span>
+            <input id="brushOpacity" type="number" min="0" max="1" step="0.05" value="1" style="width:72px" />
+          </label>
+
           <span style="flex: 1"></span>
 
           <button id="btnCopy">复制</button>

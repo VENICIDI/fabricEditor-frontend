@@ -14,6 +14,7 @@ const COMMON_KEYS = [
   'fill',
   'stroke',
   'strokeWidth',
+  'eraser',
 ];
 
 const TEXT_KEYS = ['text', 'fontSize', 'fontFamily', 'fontWeight', 'fontStyle', 'textAlign', 'underline', 'linethrough'];
