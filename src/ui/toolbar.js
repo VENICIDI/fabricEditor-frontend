@@ -1,10 +1,9 @@
 import { mustGetEl } from '../utils/dom.js';
 import { AddObjectCommand } from '../core/commands/AddObjectCommand.js';
 import { RemoveObjectCommand } from '../core/commands/RemoveObjectCommand.js';
-import { ReorderCommand } from '../core/commands/ReorderCommand.js';
 import { exportToJson, importFromJson } from '../core/serializer.js';
 import { Clipboard } from '../core/clipboard.js';
-import { createRect, createCircle, createText, createImageFromFile, createImageFromUrl, ensureObjectMeta } from '../core/objectFactory.js';
+import { createRect, createCircle, createText, ensureObjectMeta } from '../core/objectFactory.js';
 
 export function createToolbar({ canvas, commandManager, jsonModal }) {
   const clipboard = new Clipboard();
@@ -12,23 +11,16 @@ export function createToolbar({ canvas, commandManager, jsonModal }) {
   const btnRect = mustGetEl('btnRect');
   const btnCircle = mustGetEl('btnCircle');
   const btnText = mustGetEl('btnText');
-  const btnImageFile = mustGetEl('btnImageFile');
-  const btnImageUrl = mustGetEl('btnImageUrl');
 
   const btnCopy = mustGetEl('btnCopy');
   const btnPaste = mustGetEl('btnPaste');
   const btnDelete = mustGetEl('btnDelete');
-
-  const btnBringToFront = mustGetEl('btnBringToFront');
-  const btnSendToBack = mustGetEl('btnSendToBack');
 
   const btnUndo = mustGetEl('btnUndo');
   const btnRedo = mustGetEl('btnRedo');
 
   const btnExport = mustGetEl('btnExport');
   const btnImport = mustGetEl('btnImport');
-
-  const fileInput = mustGetEl('fileInput');
 
   function getSelectedTargets() {
     const active = canvas.getActiveObject();
@@ -45,26 +37,6 @@ export function createToolbar({ canvas, commandManager, jsonModal }) {
   btnRect.addEventListener('click', () => addObject(createRect()));
   btnCircle.addEventListener('click', () => addObject(createCircle()));
   btnText.addEventListener('click', () => addObject(createText()));
-
-  btnImageFile.addEventListener('click', () => {
-    fileInput.value = '';
-    fileInput.click();
-  });
-
-  fileInput.addEventListener('change', async () => {
-    const file = fileInput.files?.[0];
-    if (!file) return;
-    const obj = await createImageFromFile(file);
-    addObject(obj);
-  });
-
-  btnImageUrl.addEventListener('click', () => {
-    const url = window.prompt('输入图片 URL');
-    if (!url) return;
-    createImageFromUrl(url)
-      .then((obj) => addObject(obj))
-      .catch((err) => window.alert(err?.message || '图片加载失败'));
-  });
 
   btnDelete.addEventListener('click', () => {
     const targets = getSelectedTargets();
@@ -85,19 +57,6 @@ export function createToolbar({ canvas, commandManager, jsonModal }) {
     ensureObjectMeta(obj, obj?.data?.type || obj.type);
     commandManager.execute(new AddObjectCommand({ canvas, obj, select: true }));
   });
-
-  function reorderTo(index) {
-    const active = canvas.getActiveObject();
-    if (!active || active.type === 'activeSelection') return;
-    const objects = canvas.getObjects();
-    const beforeIndex = objects.indexOf(active);
-    if (beforeIndex < 0) return;
-    const cmd = new ReorderCommand({ canvas, target: active, beforeIndex, afterIndex: index });
-    commandManager.execute(cmd);
-  }
-
-  btnBringToFront.addEventListener('click', () => reorderTo(canvas.getObjects().length - 1));
-  btnSendToBack.addEventListener('click', () => reorderTo(0));
 
   btnUndo.addEventListener('click', () => commandManager.undo());
   btnRedo.addEventListener('click', () => commandManager.redo());

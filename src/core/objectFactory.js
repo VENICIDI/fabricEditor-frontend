@@ -48,33 +48,3 @@ export function createText() {
   });
   return ensureObjectMeta(obj, 'text');
 }
-
-export async function createImageFromFile(file) {
-  const url = URL.createObjectURL(file);
-  try {
-    return await createImageFromUrl(url);
-  } finally {
-    setTimeout(() => URL.revokeObjectURL(url), 30000);
-  }
-}
-
-export async function createImageFromUrl(url) {
-  const fabric = getFabric();
-  const img = await new Promise((resolve, reject) => {
-    fabric.Image.fromURL(
-      url,
-      (image) => {
-        if (!image) reject(new Error('图片加载失败'));
-        else resolve(image);
-      },
-      { crossOrigin: 'anonymous' },
-    );
-  });
-
-  const max = 480;
-  const w = img.width || max;
-  const h = img.height || max;
-  const scale = Math.min(1, max / Math.max(w, h));
-  img.set({ left: 120, top: 120, scaleX: scale, scaleY: scale, opacity: 1 });
-  return ensureObjectMeta(img, 'image');
-}
