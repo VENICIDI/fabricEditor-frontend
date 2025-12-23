@@ -2,7 +2,6 @@ import { mustGetEl } from '../utils/dom.js';
 import { AddObjectCommand } from '../core/commands/AddObjectCommand.js';
 import { RemoveObjectCommand } from '../core/commands/RemoveObjectCommand.js';
 import { ReorderCommand } from '../core/commands/ReorderCommand.js';
-import { MultiCommand } from '../core/commands/MultiCommand.js';
 import { exportToJson, importFromJson } from '../core/serializer.js';
 import { Clipboard } from '../core/clipboard.js';
 import { createRect, createCircle, createText, createImageFromFile, createImageFromUrl, ensureObjectMeta } from '../core/objectFactory.js';
@@ -22,8 +21,6 @@ export function createToolbar({ canvas, commandManager, jsonModal }) {
 
   const btnBringToFront = mustGetEl('btnBringToFront');
   const btnSendToBack = mustGetEl('btnSendToBack');
-  const btnBringForward = mustGetEl('btnBringForward');
-  const btnSendBackwards = mustGetEl('btnSendBackwards');
 
   const btnUndo = mustGetEl('btnUndo');
   const btnRedo = mustGetEl('btnRedo');
@@ -101,20 +98,6 @@ export function createToolbar({ canvas, commandManager, jsonModal }) {
 
   btnBringToFront.addEventListener('click', () => reorderTo(canvas.getObjects().length - 1));
   btnSendToBack.addEventListener('click', () => reorderTo(0));
-  btnBringForward.addEventListener('click', () => {
-    const active = canvas.getActiveObject();
-    if (!active || active.type === 'activeSelection') return;
-    const objects = canvas.getObjects();
-    const beforeIndex = objects.indexOf(active);
-    reorderTo(beforeIndex + 1);
-  });
-  btnSendBackwards.addEventListener('click', () => {
-    const active = canvas.getActiveObject();
-    if (!active || active.type === 'activeSelection') return;
-    const objects = canvas.getObjects();
-    const beforeIndex = objects.indexOf(active);
-    reorderTo(beforeIndex - 1);
-  });
 
   btnUndo.addEventListener('click', () => commandManager.undo());
   btnRedo.addEventListener('click', () => commandManager.redo());

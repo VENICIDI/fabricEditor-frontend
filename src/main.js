@@ -5,7 +5,6 @@ import { createCommandManager, bindCommandCapture } from './core/commandBindings
 import { createJsonModal } from './ui/modal.js';
 import { createToolbar } from './ui/toolbar.js';
 import { createInspectorPanel } from './ui/inspectorPanel.js';
-import { createLayersPanel } from './ui/layersPanel.js';
 import { bindShortcuts } from './ui/shortcuts.js';
 
 try {
@@ -22,7 +21,6 @@ try {
   const jsonModal = createJsonModal();
   const toolbar = createToolbar({ canvas, commandManager, jsonModal });
   createInspectorPanel({ canvas, commandManager });
-  createLayersPanel({ canvas });
 
   bindShortcuts({
     canvas,
