@@ -1,0 +1,115 @@
+
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fabric.js 画布编辑器 MVP</title>
+    <link rel="stylesheet" href="./editor.css" />
+  </head>
+  <body>
+    <div class="app">
+      <section class="panel" aria-label="图层">
+        <div class="panel-header">
+          <span>图层</span>
+          <div>
+            <button id="btnBringForward" title="上移一层">上移</button>
+            <button id="btnSendBackwards" title="下移一层">下移</button>
+          </div>
+        </div>
+        <div class="panel-body">
+          <div class="hint" style="margin-bottom: 10px">点击图层可选中对象。</div>
+          <div id="layers"></div>
+        </div>
+      </section>
+
+      <main class="canvas-shell" aria-label="画布">
+        <div class="toolbar">
+          <button class="primary" id="btnRect">矩形</button>
+          <button class="primary" id="btnCircle">圆形</button>
+          <button class="primary" id="btnText">文本</button>
+          <button id="btnImageFile">图片(本地)</button>
+          <button id="btnImageUrl">图片(URL)</button>
+
+          <span style="flex: 1"></span>
+
+          <button id="btnCopy">复制</button>
+          <button id="btnPaste">粘贴</button>
+          <button id="btnDelete">删除</button>
+
+          <button id="btnBringToFront">置顶</button>
+          <button id="btnSendToBack">置底</button>
+
+          <button id="btnUndo" title="⌘Z / Ctrl+Z">撤销</button>
+          <button id="btnRedo" title="⌘Y / Ctrl+Y">重做</button>
+
+          <button id="btnExport">导出</button>
+          <button id="btnImport">导入</button>
+        </div>
+        <div class="canvas-wrap" id="canvasContainer">
+          <canvas id="c"></canvas>
+        </div>
+      </main>
+
+      <section class="panel" aria-label="属性">
+        <div class="panel-header">
+          <span>属性</span>
+          <span class="hint" id="selectionMeta"></span>
+        </div>
+        <div class="panel-body">
+          <div class="row">
+            <label for="fill">填充</label>
+            <input id="fill" type="color" value="#3b82f6" />
+          </div>
+          <div class="row">
+            <label for="stroke">描边</label>
+            <input id="stroke" type="color" value="#111827" />
+          </div>
+          <div class="row">
+            <label for="strokeWidth">描边宽度</label>
+            <input id="strokeWidth" type="number" min="0" step="1" value="2" />
+          </div>
+          <div class="row">
+            <label for="opacity">透明度</label>
+            <input id="opacity" type="number" min="0" max="1" step="0.05" value="1" />
+          </div>
+
+          <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 14px 0" />
+
+          <div class="row">
+            <label for="text">文本</label>
+            <input id="text" type="text" placeholder="仅对文本对象生效" />
+          </div>
+          <div class="row">
+            <label for="fontSize">字号</label>
+            <input id="fontSize" type="number" min="6" step="1" value="32" />
+          </div>
+          <div class="hint">
+            快捷键： <span class="kbd">⌘Z</span>/<span class="kbd">Ctrl+Z</span> 撤销，
+            <span class="kbd">⌘Y</span>/<span class="kbd">Ctrl+Y</span> 重做， <span class="kbd">⌫</span> 删除，
+            <span class="kbd">⌘C</span>/<span class="kbd">Ctrl+C</span> 复制， <span class="kbd">⌘V</span>/<span class="kbd">Ctrl+V</span>
+            粘贴。
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <dialog id="jsonModal">
+      <div class="modal-header">
+        <strong id="jsonModalTitle">JSON</strong>
+        <button id="btnCloseModal">关闭</button>
+      </div>
+      <div class="modal-body">
+        <textarea id="jsonTextarea" rows="18" spellcheck="false"></textarea>
+      </div>
+      <div class="modal-actions">
+        <button id="btnConfirmModal" class="primary">确定</button>
+      </div>
+    </dialog>
+
+    <input id="fileInput" type="file" accept="image/*" style="display: none" />
+
+    <script src="https://cdn.jsdelivr.net/npm/fabric@latest/dist/index.min.js"></script>
+    <script type="module" src="./src/main.js"></script>
+  </body>
+</html>
