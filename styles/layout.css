@@ -1,7 +1,7 @@
 .app {
   height: 100%;
   display: grid;
-  grid-template-columns: 1fr 320px;
+  grid-template-columns: 56px 1fr 320px;
   gap: 12px;
   padding: 12px;
   box-sizing: border-box;
@@ -44,13 +44,13 @@
   min-height: 0;
 }
 
-.toolbar {
-  padding: 10px;
+.top-toolbar {
+  padding: 8px 10px;
   border-bottom: 1px solid #e5e7eb;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
   background: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .canvas-wrap {

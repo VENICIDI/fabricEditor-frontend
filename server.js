@@ -18,7 +18,13 @@ const server = http.createServer((req, res) => {
   const typeMap = {
     '.html': 'text/html',
     '.js': 'application/javascript',
-    '.css': 'text/css'
+    '.css': 'text/css',
+    '.svg': 'image/svg+xml',
+    '.png': 'image/png',
+    '.jpg': 'image/jpeg',
+    '.jpeg': 'image/jpeg',
+    '.gif': 'image/gif',
+    '.webp': 'image/webp'
   };
 
   fs.stat(filePath, (err, stats) => {

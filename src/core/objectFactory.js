@@ -37,6 +37,25 @@ export function createCircle() {
   return ensureObjectMeta(obj, 'circle');
 }
 
+export function createPolygon() {
+  const fabric = getFabric();
+  const points = [
+    { x: 0, y: 0 },
+    { x: 120, y: 20 },
+    { x: 100, y: 110 },
+    { x: 20, y: 100 },
+  ];
+  const obj = new fabric.Polygon(points, {
+    left: 150,
+    top: 150,
+    fill: '#f59e0b',
+    stroke: '#111827',
+    strokeWidth: 2,
+    opacity: 1,
+  });
+  return ensureObjectMeta(obj, 'polygon');
+}
+
 export function createText() {
   const fabric = getFabric();
   const obj = new fabric.IText('双击编辑', {

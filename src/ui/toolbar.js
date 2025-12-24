@@ -3,7 +3,7 @@ import { AddObjectCommand } from '../core/commands/AddObjectCommand.js';
 import { RemoveObjectCommand } from '../core/commands/RemoveObjectCommand.js';
 import { exportToJson, importFromJson } from '../core/serializer.js';
 import { Clipboard } from '../core/clipboard.js';
-import { createRect, createCircle, createText, ensureObjectMeta } from '../core/objectFactory.js';
+import { createRect, createCircle, createPolygon, createText, ensureObjectMeta } from '../core/objectFactory.js';
 
 export function createToolbar({ canvas, commandManager, jsonModal }) {
   const clipboard = new Clipboard();
@@ -11,6 +11,11 @@ export function createToolbar({ canvas, commandManager, jsonModal }) {
   const btnRect = mustGetEl('btnRect');
   const btnCircle = mustGetEl('btnCircle');
   const btnText = mustGetEl('btnText');
+  const btnPolygon = mustGetEl('btnPolygon');
+
+  const btnShape = document.getElementById('btnShape');
+  const shapeMenu = document.getElementById('shapeMenu');
+  const brushMenu = document.getElementById('brushMenu');
 
   const btnCopy = mustGetEl('btnCopy');
   const btnPaste = mustGetEl('btnPaste');
@@ -29,6 +34,78 @@ export function createToolbar({ canvas, commandManager, jsonModal }) {
   const brushWidth = mustGetEl('brushWidth');
   const brushOpacity = mustGetEl('brushOpacity');
 
+  function setActiveToolButton(activeId) {
+    const ids = ['btnSelectMode', 'btnShape', 'btnText', 'btnBrush', 'btnEraser'];
+    for (const id of ids) {
+      const el = document.getElementById(id);
+      if (!el) continue;
+      el.setAttribute('aria-pressed', String(id === activeId));
+    }
+  }
+
+  function hidePopovers() {
+    if (shapeMenu) shapeMenu.hidden = true;
+    if (brushMenu) brushMenu.hidden = true;
+  }
+
+  function placePopover(popoverEl, anchorEl) {
+    if (!popoverEl || !anchorEl) return;
+    const tb = anchorEl.closest('.left-toolbar') || anchorEl.parentElement;
+    const rootRect = (tb || document.body).getBoundingClientRect();
+    const anchorRect = anchorEl.getBoundingClientRect();
+
+    const top = Math.max(8, Math.round(anchorRect.top - rootRect.top - 6));
+    popoverEl.style.top = `${top}px`;
+  }
+
+  function togglePopover(popoverEl, anchorEl) {
+    if (!popoverEl) return;
+    const next = !popoverEl.hidden;
+    hidePopovers();
+    popoverEl.hidden = next;
+    if (!popoverEl.hidden) placePopover(popoverEl, anchorEl);
+  }
+
+  function openPopover(popoverEl, anchorEl) {
+    if (!popoverEl) return;
+    hidePopovers();
+    popoverEl.hidden = false;
+    placePopover(popoverEl, anchorEl);
+  }
+
+  function bindLongPressOrContextMenu({ targetEl, onOpen }) {
+    if (!targetEl) return;
+    let timer = null;
+    const LONG_PRESS_MS = 450;
+
+    const start = (ev) => {
+      if (timer) window.clearTimeout(timer);
+      timer = window.setTimeout(() => {
+        timer = null;
+        onOpen(ev);
+      }, LONG_PRESS_MS);
+    };
+
+    const cancel = () => {
+      if (!timer) return;
+      window.clearTimeout(timer);
+      timer = null;
+    };
+
+    targetEl.addEventListener('pointerdown', (ev) => {
+      if (ev.button !== 0) return;
+      start(ev);
+    });
+    targetEl.addEventListener('pointerup', cancel);
+    targetEl.addEventListener('pointercancel', cancel);
+    targetEl.addEventListener('pointerleave', cancel);
+
+    targetEl.addEventListener('contextmenu', (ev) => {
+      ev.preventDefault();
+      onOpen(ev);
+    });
+  }
+
   function getSelectedTargets() {
     const active = canvas.getActiveObject();
     if (!active) return [];
@@ -41,9 +118,37 @@ export function createToolbar({ canvas, commandManager, jsonModal }) {
     commandManager.execute(cmd);
   }
 
-  btnRect.addEventListener('click', () => addObject(createRect()));
-  btnCircle.addEventListener('click', () => addObject(createCircle()));
-  btnText.addEventListener('click', () => addObject(createText()));
+  btnRect.addEventListener('click', () => {
+    addObject(createRect());
+    setActiveToolButton(btnShape ? 'btnShape' : 'btnSelectMode');
+    hidePopovers();
+  });
+
+  btnCircle.addEventListener('click', () => {
+    addObject(createCircle());
+    setActiveToolButton(btnShape ? 'btnShape' : 'btnSelectMode');
+    hidePopovers();
+  });
+
+  btnPolygon.addEventListener('click', () => {
+    addObject(createPolygon());
+    setActiveToolButton(btnShape ? 'btnShape' : 'btnSelectMode');
+    hidePopovers();
+  });
+
+  btnText.addEventListener('click', () => {
+    addObject(createText());
+    setActiveToolButton('btnText');
+    hidePopovers();
+  });
+
+  if (btnShape && shapeMenu) {
+    btnShape.addEventListener('click', () => togglePopover(shapeMenu, btnShape));
+    bindLongPressOrContextMenu({
+      targetEl: btnShape,
+      onOpen: () => openPopover(shapeMenu, btnShape),
+    });
+  }
 
   function getDrawingController() {
     return canvas.__drawing;
@@ -70,6 +175,8 @@ export function createToolbar({ canvas, commandManager, jsonModal }) {
     const drawing = getDrawingController();
     if (!drawing) return;
     drawing.setDrawingMode(false);
+    setActiveToolButton('btnSelectMode');
+    hidePopovers();
   });
 
   btnBrush.addEventListener('click', () => {
@@ -78,6 +185,7 @@ export function createToolbar({ canvas, commandManager, jsonModal }) {
     drawing.setTool('brush');
     syncBrushSettingsToCanvas();
     drawing.setDrawingMode(true);
+    setActiveToolButton('btnBrush');
   });
 
   btnEraser.addEventListener('click', () => {
@@ -86,11 +194,33 @@ export function createToolbar({ canvas, commandManager, jsonModal }) {
     drawing.setTool('eraser');
     syncBrushSettingsToCanvas();
     drawing.setDrawingMode(true);
+    setActiveToolButton('btnEraser');
+  });
+
+  bindLongPressOrContextMenu({
+    targetEl: btnBrush,
+    onOpen: () => openPopover(brushMenu, btnBrush),
+  });
+
+  bindLongPressOrContextMenu({
+    targetEl: btnEraser,
+    onOpen: () => openPopover(brushMenu, btnEraser),
   });
 
   brushColor.addEventListener('input', () => syncBrushSettingsToCanvas());
   brushWidth.addEventListener('input', () => syncBrushSettingsToCanvas());
   brushOpacity.addEventListener('input', () => syncBrushSettingsToCanvas());
+
+  document.addEventListener('pointerdown', (ev) => {
+    const t = ev.target;
+    if (!(t instanceof Element)) return;
+    if (t.closest('#shapeMenu') || t.closest('#brushMenu') || t.closest('#btnShape') || t.closest('#btnBrush') || t.closest('#btnEraser')) return;
+    hidePopovers();
+  });
+
+  document.addEventListener('keydown', (ev) => {
+    if (ev.key === 'Escape') hidePopovers();
+  });
 
   btnDelete.addEventListener('click', () => {
     const targets = getSelectedTargets();
@@ -147,6 +277,8 @@ export function createToolbar({ canvas, commandManager, jsonModal }) {
 
   commandManager.onChange = refreshButtons;
   refreshButtons();
+
+  setActiveToolButton('btnSelectMode');
 
   return { refreshButtons };
 }

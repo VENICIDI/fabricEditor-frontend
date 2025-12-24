@@ -9,40 +9,102 @@
   </head>
   <body>
     <div class="app">
-      <main class="canvas-shell" aria-label="画布">
-        <div class="toolbar">
-          <button class="primary" id="btnRect">矩形</button>
-          <button class="primary" id="btnCircle">圆形</button>
-          <button class="primary" id="btnText">文本</button>
+      <nav class="left-toolbar" aria-label="工具" id="leftToolbar">
+        <div class="tool-group">
+          <button class="tool-btn" id="btnSelectMode" aria-pressed="true" data-tooltip="选择">
+            <img class="tool-svg" src="./svg/select.svg" alt="" aria-hidden="true" />
+          </button>
 
-          <button id="btnSelectMode">选择</button>
-          <button id="btnBrush">画笔</button>
-          <button id="btnEraser">橡皮擦</button>
+          <button class="tool-btn tool-btn--has-menu" id="btnShape" aria-pressed="false" data-tooltip="形状">
+            <img class="tool-svg" src="./svg/rectangle.svg" alt="" aria-hidden="true" />
+          </button>
 
-          <label style="display:flex; align-items:center; gap:6px;">
-            <span style="font-size:12px; color:#374151;">颜色</span>
+          <button class="tool-btn" id="btnText" aria-pressed="false" data-tooltip="文本">
+            <img class="tool-svg" src="./svg/text.svg" alt="" aria-hidden="true" />
+          </button>
+        </div>
+
+        <div class="tool-sep" role="separator"></div>
+
+        <div class="tool-group">
+          <button class="tool-btn" id="btnBrush" aria-pressed="false" data-tooltip="画笔">
+            <img class="tool-svg" src="./svg/pen.svg" alt="" aria-hidden="true" />
+          </button>
+          <button class="tool-btn" id="btnEraser" aria-pressed="false" data-tooltip="橡皮擦">
+            <img class="tool-svg" src="./svg/erase.svg" alt="" aria-hidden="true" />
+          </button>
+        </div>
+
+        <div class="tool-sep" role="separator"></div>
+
+        <div class="tool-group tool-group--bottom"></div>
+
+        <div class="tool-popover" id="shapeMenu" role="menu" hidden>
+          <button class="tool-menu-item" id="btnRect" role="menuitem" data-tooltip="矩形">
+            <img class="tool-svg" src="./svg/rectangle.svg" alt="" aria-hidden="true" />
+            <span>矩形</span>
+          </button>
+          <button class="tool-menu-item" id="btnCircle" role="menuitem" data-tooltip="圆形">
+            <span class="tool-menu-icon" aria-hidden="true">◯</span>
+            <span>圆形</span>
+          </button>
+          <button class="tool-menu-item" id="btnPolygon" role="menuitem" data-tooltip="多边形">
+            <span class="tool-menu-icon" aria-hidden="true">⬠</span>
+            <span>多边形</span>
+          </button>
+        </div>
+
+        <div class="tool-popover" id="brushMenu" role="menu" hidden>
+          <div class="tool-menu-row">
+            <label for="brushColor">颜色</label>
             <input id="brushColor" type="color" value="#111111" />
-          </label>
-          <label style="display:flex; align-items:center; gap:6px;">
-            <span style="font-size:12px; color:#374151;">线宽</span>
-            <input id="brushWidth" type="number" min="1" step="1" value="4" style="width:72px" />
-          </label>
-          <label style="display:flex; align-items:center; gap:6px;">
-            <span style="font-size:12px; color:#374151;">透明度</span>
-            <input id="brushOpacity" type="number" min="0" max="1" step="0.05" value="1" style="width:72px" />
-          </label>
+          </div>
+          <div class="tool-menu-row">
+            <label for="brushWidth">线宽</label>
+            <input id="brushWidth" type="number" min="1" step="1" value="4" />
+          </div>
+          <div class="tool-menu-row">
+            <label for="brushOpacity">透明度</label>
+            <input id="brushOpacity" type="number" min="0" max="1" step="0.05" value="1" />
+          </div>
+        </div>
+      </nav>
 
-          <span style="flex: 1"></span>
+      <main class="canvas-shell" aria-label="画布">
+        <div class="top-toolbar" aria-label="编辑">
+          <div class="top-toolbar-group">
+            <button class="top-btn" id="btnUndo" data-tooltip="撤销">
+              <img class="tool-svg" src="./svg/undo.svg" alt="" aria-hidden="true" />
+            </button>
+            <button class="top-btn" id="btnRedo" data-tooltip="重做">
+              <img class="tool-svg" src="./svg/redo.svg" alt="" aria-hidden="true" />
+            </button>
+          </div>
 
-          <button id="btnCopy">复制</button>
-          <button id="btnPaste">粘贴</button>
-          <button id="btnDelete">删除</button>
+          <div class="top-toolbar-sep" role="separator"></div>
 
-          <button id="btnUndo" title="⌘Z / Ctrl+Z">撤销</button>
-          <button id="btnRedo" title="⌘Y / Ctrl+Y">重做</button>
+          <div class="top-toolbar-group">
+            <button class="top-btn" id="btnCopy" data-tooltip="复制">
+              <img class="tool-svg" src="./svg/copy.svg" alt="" aria-hidden="true" />
+            </button>
+            <button class="top-btn" id="btnPaste" data-tooltip="粘贴">
+              <img class="tool-svg" src="./svg/paste.svg" alt="" aria-hidden="true" />
+            </button>
+            <button class="top-btn" id="btnDelete" data-tooltip="删除">
+              <img class="tool-svg" src="./svg/delete.svg" alt="" aria-hidden="true" />
+            </button>
+          </div>
 
-          <button id="btnExport">导出</button>
-          <button id="btnImport">导入</button>
+          <span class="top-toolbar-spacer"></span>
+
+          <div class="top-toolbar-group">
+            <button class="top-btn" id="btnExport" data-tooltip="导出">
+              <img class="tool-svg" src="./svg/export.svg" alt="" aria-hidden="true" />
+            </button>
+            <button class="top-btn" id="btnImport" data-tooltip="导入">
+              <img class="tool-svg" src="./svg/import.svg" alt="" aria-hidden="true" />
+            </button>
+          </div>
         </div>
         <div class="canvas-wrap" id="canvasContainer">
           <canvas id="c"></canvas>

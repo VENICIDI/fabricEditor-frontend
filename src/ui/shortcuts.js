@@ -150,6 +150,45 @@ export function bindShortcuts({ canvas, commandManager, onDelete, onCopy, onPast
       return;
     }
 
+    const key = e.key.toLowerCase();
+    if (!mod && !e.altKey && !e.shiftKey && key === 'v') {
+      e.preventDefault();
+      document.getElementById('btnSelectMode')?.click();
+      return;
+    }
+
+    if (!mod && !e.altKey && !e.shiftKey && key === 't') {
+      e.preventDefault();
+      document.getElementById('btnText')?.click();
+      return;
+    }
+
+    if (!mod && !e.altKey && !e.shiftKey && key === 'e') {
+      e.preventDefault();
+      document.getElementById('btnEraser')?.click();
+      return;
+    }
+
+    if (!mod && !e.altKey && !e.shiftKey && key === 'r') {
+      e.preventDefault();
+      const shapeBtn = document.getElementById('btnShape');
+      if (shapeBtn) shapeBtn.click();
+      else document.getElementById('btnRect')?.click();
+      return;
+    }
+
+    if (!mod && !e.altKey && !e.shiftKey && key === 'o') {
+      e.preventDefault();
+      document.getElementById('btnCircle')?.click();
+      return;
+    }
+
+    if (!mod && !e.altKey && !e.shiftKey && key === 'p') {
+      e.preventDefault();
+      document.getElementById('btnPolygon')?.click();
+      return;
+    }
+
     void canvas;
   });
 }
