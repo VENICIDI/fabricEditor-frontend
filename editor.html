@@ -103,6 +103,36 @@
               <span class="top-btn-text">导入</span>
             </button>
           </div>
+
+          <div class="top-popover" id="exportMenu" role="menu" hidden>
+            <button class="tool-menu-item" id="btnExportPng1x" role="menuitem">
+              <span>导出 PNG（1x）</span>
+            </button>
+            <button class="tool-menu-item" id="btnExportPng2x" role="menuitem">
+              <span>导出 PNG（2x）</span>
+            </button>
+            <button class="tool-menu-item" id="btnExportSvg" role="menuitem">
+              <span>导出 SVG</span>
+            </button>
+            <button class="tool-menu-item" id="btnExportJson" role="menuitem">
+              <span>导出 JSON</span>
+            </button>
+          </div>
+
+          <div class="top-popover" id="importMenu" role="menu" hidden>
+            <button class="tool-menu-item" id="btnImportImage" role="menuitem">
+              <span>导入图片</span>
+            </button>
+            <button class="tool-menu-item" id="btnImportSvg" role="menuitem">
+              <span>导入 SVG</span>
+            </button>
+            <button class="tool-menu-item" id="btnImportJson" role="menuitem">
+              <span>导入 JSON</span>
+            </button>
+          </div>
+
+          <input id="fileImportImage" type="file" accept="image/*" hidden />
+          <input id="fileImportSvg" type="file" accept="image/svg+xml" hidden />
         </div>
         <div class="canvas-wrap" id="canvasContainer">
           <canvas id="c"></canvas>

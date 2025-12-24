@@ -158,6 +158,18 @@ button.primary {
   z-index: 5;
 }
 
+.top-popover {
+  position: absolute;
+  top: calc(100% + 8px);
+  min-width: 200px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.14);
+  padding: 6px;
+  z-index: 10;
+}
+
 .tool-menu-item {
   width: 100%;
   display: flex;

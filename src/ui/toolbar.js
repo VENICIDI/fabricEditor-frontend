@@ -4,6 +4,7 @@ import { RemoveObjectCommand } from '../core/commands/RemoveObjectCommand.js';
 import { exportToJson, importFromJson } from '../core/serializer.js';
 import { Clipboard } from '../core/clipboard.js';
 import { createRect, createCircle, createText, ensureObjectMeta } from '../core/objectFactory.js';
+import { getFabric } from '../fabric/fabricGlobal.js';
 
 // 左侧工具栏：负责绑定 UI 按钮事件，并将操作转换为命令/画布行为
 export function createToolbar({ canvas, commandManager, jsonModal }) {
@@ -28,6 +29,18 @@ export function createToolbar({ canvas, commandManager, jsonModal }) {
   const btnExport = mustGetEl('btnExport');
   const btnImport = mustGetEl('btnImport');
 
+  const exportMenu = document.getElementById('exportMenu');
+  const importMenu = document.getElementById('importMenu');
+  const btnExportPng1x = document.getElementById('btnExportPng1x');
+  const btnExportPng2x = document.getElementById('btnExportPng2x');
+  const btnExportSvg = document.getElementById('btnExportSvg');
+  const btnExportJson = document.getElementById('btnExportJson');
+  const btnImportImage = document.getElementById('btnImportImage');
+  const btnImportSvg = document.getElementById('btnImportSvg');
+  const btnImportJson = document.getElementById('btnImportJson');
+  const fileImportImage = document.getElementById('fileImportImage');
+  const fileImportSvg = document.getElementById('fileImportSvg');
+
   const btnSelectMode = mustGetEl('btnSelectMode');
   const btnBrush = mustGetEl('btnBrush');
   const btnEraser = mustGetEl('btnEraser');
@@ -49,6 +62,8 @@ export function createToolbar({ canvas, commandManager, jsonModal }) {
   function hidePopovers() {
     if (shapeMenu) shapeMenu.hidden = true;
     if (brushMenu) brushMenu.hidden = true;
+    if (exportMenu) exportMenu.hidden = true;
+    if (importMenu) importMenu.hidden = true;
   }
 
   // 将 popover 垂直定位到锚点附近（相对工具栏容器）
@@ -69,6 +84,41 @@ export function createToolbar({ canvas, commandManager, jsonModal }) {
     hidePopovers();
     popoverEl.hidden = next;
     if (!popoverEl.hidden) placePopover(popoverEl, anchorEl);
+  }
+
+  function placeTopPopover(popoverEl, anchorEl) {
+    if (!popoverEl || !anchorEl) return;
+    const root = anchorEl.closest('.top-toolbar') || anchorEl.parentElement;
+    const rootRect = (root || document.body).getBoundingClientRect();
+    const anchorRect = anchorEl.getBoundingClientRect();
+    const left = Math.max(8, Math.round(anchorRect.left - rootRect.left));
+    popoverEl.style.left = `${left}px`;
+  }
+
+  function toggleTopPopover(popoverEl, anchorEl) {
+    if (!popoverEl) return;
+    const next = !popoverEl.hidden;
+    hidePopovers();
+    popoverEl.hidden = next;
+    if (!popoverEl.hidden) placeTopPopover(popoverEl, anchorEl);
+  }
+
+  function downloadBlob({ blob, filename }) {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function downloadText({ text, filename, mime }) {
+    downloadBlob({ blob: new Blob([text], { type: mime || 'text/plain;charset=utf-8' }), filename });
+  }
+
+  async function downloadDataUrl({ dataUrl, filename }) {
+    const blob = await (await fetch(dataUrl)).blob();
+    downloadBlob({ blob, filename });
   }
 
   // 打开 popover（并确保其它 popover 关闭）
@@ -220,7 +270,18 @@ export function createToolbar({ canvas, commandManager, jsonModal }) {
   document.addEventListener('pointerdown', (ev) => {
     const t = ev.target;
     if (!(t instanceof Element)) return;
-    if (t.closest('#shapeMenu') || t.closest('#brushMenu') || t.closest('#btnShape') || t.closest('#btnBrush') || t.closest('#btnEraser')) return;
+    if (
+      t.closest('#shapeMenu') ||
+      t.closest('#brushMenu') ||
+      t.closest('#exportMenu') ||
+      t.closest('#importMenu') ||
+      t.closest('#btnShape') ||
+      t.closest('#btnBrush') ||
+      t.closest('#btnEraser') ||
+      t.closest('#btnExport') ||
+      t.closest('#btnImport')
+    )
+      return;
     hidePopovers();
   });
 
@@ -252,31 +313,193 @@ export function createToolbar({ canvas, commandManager, jsonModal }) {
   btnUndo.addEventListener('click', () => commandManager.undo());
   btnRedo.addEventListener('click', () => commandManager.redo());
 
-  btnExport.addEventListener('click', () => {
-    const value = exportToJson(canvas);
-    jsonModal.open({ title: '导出 JSON', value, readOnly: true, onConfirm: () => {} });
-  });
+  btnExport.addEventListener('click', () => toggleTopPopover(exportMenu, btnExport));
+  btnImport.addEventListener('click', () => toggleTopPopover(importMenu, btnImport));
 
-  btnImport.addEventListener('click', () => {
-    jsonModal.open({
-      title: '导入 JSON（会清空画布并清空历史）',
-      value: '',
-      readOnly: false,
-      onConfirm: async (value) => {
-        try {
-          // 先清空画布，再加载 JSON，最后清空历史（避免历史与当前状态不一致）
-          canvas.clear();
-          canvas.setBackgroundColor('#ffffff', () => {});
-          await importFromJson({ canvas, jsonString: value });
-          canvas.discardActiveObject();
-          canvas.requestRenderAll();
-          commandManager.clear();
-        } catch (e) {
-          window.alert(e?.message || '导入失败');
-        }
-      },
+  if (btnExportPng1x) {
+    btnExportPng1x.addEventListener('click', async () => {
+      try {
+        hidePopovers();
+        const dataUrl = canvas.toDataURL({ format: 'png', multiplier: 1, enableRetinaScaling: true });
+        await downloadDataUrl({ dataUrl, filename: 'export.png' });
+      } catch (e) {
+        window.alert(e?.message || '导出失败');
+      }
     });
-  });
+  }
+
+  if (btnExportPng2x) {
+    btnExportPng2x.addEventListener('click', async () => {
+      try {
+        hidePopovers();
+        const dataUrl = canvas.toDataURL({ format: 'png', multiplier: 2, enableRetinaScaling: true });
+        await downloadDataUrl({ dataUrl, filename: 'export@2x.png' });
+      } catch (e) {
+        window.alert(e?.message || '导出失败');
+      }
+    });
+  }
+
+  if (btnExportSvg) {
+    btnExportSvg.addEventListener('click', () => {
+      try {
+        hidePopovers();
+        const svg = canvas.toSVG();
+        downloadText({ text: svg, filename: 'export.svg', mime: 'image/svg+xml;charset=utf-8' });
+      } catch (e) {
+        window.alert(e?.message || '导出失败');
+      }
+    });
+  }
+
+  if (btnExportJson) {
+    btnExportJson.addEventListener('click', () => {
+      hidePopovers();
+      const value = exportToJson(canvas);
+      jsonModal.open({ title: '导出 JSON', value, readOnly: true, onConfirm: () => {} });
+    });
+  }
+
+  if (btnImportImage && fileImportImage) {
+    btnImportImage.addEventListener('click', () => {
+      hidePopovers();
+      fileImportImage.value = '';
+      fileImportImage.click();
+    });
+
+    fileImportImage.addEventListener('change', async () => {
+      const file = fileImportImage.files?.[0];
+      if (!file) return;
+
+      try {
+        const dataUrl = await new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onerror = () => reject(new Error('读取文件失败'));
+          reader.onload = () => resolve(String(reader.result));
+          reader.readAsDataURL(file);
+        });
+
+        const fabric = getFabric();
+        // 兼容 Fabric v6（Promise 风格）与 v5（回调风格）
+        let img = null;
+        try {
+          const maybePromise = fabric.Image?.fromURL?.(dataUrl, { crossOrigin: 'anonymous' });
+          if (maybePromise && typeof maybePromise.then === 'function') {
+            img = await maybePromise;
+          }
+        } catch (e) {
+          void e;
+        }
+
+        if (!img) {
+          img = await new Promise((resolve, reject) => {
+            if (!fabric.Image?.fromURL) {
+              reject(new Error('Fabric.Image.fromURL 不可用'));
+              return;
+            }
+            fabric.Image.fromURL(
+              dataUrl,
+              (result) => {
+                if (!result) {
+                  reject(new Error('解析图片失败'));
+                  return;
+                }
+                resolve(result);
+              },
+              { crossOrigin: 'anonymous' },
+            );
+          });
+        }
+
+        img.set({ left: 80, top: 80 });
+        ensureObjectMeta(img, 'image');
+        commandManager.execute(new AddObjectCommand({ canvas, obj: img, select: true }));
+      } catch (e) {
+        console.error(e);
+        window.alert(e?.message || '导入失败');
+      }
+    });
+  }
+
+  if (btnImportSvg && fileImportSvg) {
+    btnImportSvg.addEventListener('click', () => {
+      hidePopovers();
+      fileImportSvg.value = '';
+      fileImportSvg.click();
+    });
+
+    fileImportSvg.addEventListener('change', async () => {
+      const file = fileImportSvg.files?.[0];
+      if (!file) return;
+
+      try {
+        const svgText = await file.text();
+        const fabric = getFabric();
+
+        // 兼容 Fabric v6（Promise 风格）与 v5（回调风格）
+        let objects = null;
+        let options = null;
+        try {
+          const maybePromise = fabric.loadSVGFromString?.(svgText);
+          if (maybePromise && typeof maybePromise.then === 'function') {
+            const res = await maybePromise;
+            objects = res?.objects;
+            options = res?.options;
+          }
+        } catch (e) {
+          void e;
+        }
+
+        if (!objects) {
+          await new Promise((resolve, reject) => {
+            if (typeof fabric.loadSVGFromString !== 'function') {
+              reject(new Error('fabric.loadSVGFromString 不可用'));
+              return;
+            }
+            fabric.loadSVGFromString(svgText, (objs, opts) => {
+              objects = objs;
+              options = opts;
+              resolve();
+            });
+          });
+        }
+
+        if (!objects || objects.length === 0) throw new Error('SVG 为空或无法解析');
+        const groupFn = fabric.util?.groupSVGElements;
+        if (typeof groupFn !== 'function') throw new Error('fabric.util.groupSVGElements 不可用');
+        const obj = groupFn(objects, options);
+        obj.set({ left: 80, top: 80 });
+        ensureObjectMeta(obj, 'svg');
+        commandManager.execute(new AddObjectCommand({ canvas, obj, select: true }));
+      } catch (e) {
+        console.error(e);
+        window.alert(e?.message || '导入失败');
+      }
+    });
+  }
+
+  if (btnImportJson) {
+    btnImportJson.addEventListener('click', () => {
+      hidePopovers();
+      jsonModal.open({
+        title: '导入 JSON（会清空画布并清空历史）',
+        value: '',
+        readOnly: false,
+        onConfirm: async (value) => {
+          try {
+            canvas.clear();
+            canvas.setBackgroundColor('#ffffff', () => {});
+            await importFromJson({ canvas, jsonString: value });
+            canvas.discardActiveObject();
+            canvas.requestRenderAll();
+            commandManager.clear();
+          } catch (e) {
+            window.alert(e?.message || '导入失败');
+          }
+        },
+      });
+    });
+  }
 
   // 根据命令栈状态刷新 undo/redo 按钮可用性
   function refreshButtons() {
