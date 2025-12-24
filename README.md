@@ -9,7 +9,7 @@
 
 ### 使用内置静态服务器（推荐）
 
-项目提供 `server.js` 作为简易静态服务器（用于本地预览 `editor.html` 及静态资源）,通过用node启动server脚本实现项目的启动：
+通过node启动server脚本实现项目的启动：
 
 ```bash
 node server.js
