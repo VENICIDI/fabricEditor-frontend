@@ -10,6 +10,7 @@ import { getSnapshot } from './core/objectSnapshot.js';
 import { createJsonModal } from './ui/modal.js';
 import { createToolbar } from './ui/toolbar.js';
 import { createInspectorPanel } from './ui/inspectorPanel.js';
+import { createLayersPanel } from './ui/layersPanel.js';
 import { bindShortcuts } from './ui/shortcuts.js';
 
 // 应用入口：初始化 Fabric 扩展、画布、命令系统与 UI 组件，并绑定核心事件
@@ -31,7 +32,16 @@ try {
   // 初始化 UI
   const jsonModal = createJsonModal();
   const toolbar = createToolbar({ canvas, commandManager, jsonModal });
+  createLayersPanel({ canvas, commandManager });
   createInspectorPanel({ canvas, commandManager });
+
+  canvas.on('object:added', (e) => {
+    if (commandManager.isReplaying) return;
+    const obj = e?.target;
+    if (!obj) return;
+    const type = obj?.data?.type || obj?.type;
+    ensureObjectMeta(obj, type || 'object');
+  });
 
   // 绑定快捷键（并对输入框场景做处理，避免误触）
   bindShortcuts({

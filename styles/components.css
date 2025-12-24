@@ -268,3 +268,62 @@ input[type='color'] {
   color: #6b7280;
   line-height: 1.4;
 }
+
+ .layer-item {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+  align-items: center;
+  padding: 8px 8px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  margin-bottom: 8px;
+  cursor: pointer;
+ }
+
+ .layer-item:hover {
+  background: #f9fafb;
+ }
+
+ .layer-item.active {
+  border-color: #c7d2fe;
+  background: #eef2ff;
+ }
+
+ .layer-meta {
+  min-width: 0;
+ }
+
+ .layer-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: #111827;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+ }
+
+ .layer-sub {
+  font-size: 11px;
+  color: #6b7280;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+ }
+
+ .layer-actions {
+  display: grid;
+  grid-template-columns: repeat(3, auto);
+  gap: 6px;
+ }
+
+ .layer-action {
+  padding: 4px 6px;
+  border-radius: 8px;
+  font-size: 12px;
+ }
+
+ .layer-action--danger {
+  border-color: #fecaca;
+  color: #b91c1c;
+ }

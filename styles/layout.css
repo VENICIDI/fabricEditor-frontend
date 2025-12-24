@@ -61,6 +61,17 @@
   min-height: 0;
 }
 
+ .right-panels {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 0;
+ }
+
+ .right-panels .panel {
+  flex: 1;
+ }
+
 #c {
   display: block;
 }

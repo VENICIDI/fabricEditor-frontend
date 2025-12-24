@@ -107,47 +107,58 @@
         </div>
       </main>
 
-      <section class="panel" aria-label="属性">
-        <div class="panel-header">
-          <span>属性</span>
-          <span class="hint" id="selectionMeta"></span>
-        </div>
-        <div class="panel-body">
-          <div class="row">
-            <label for="fill">填充</label>
-            <input id="fill" type="color" value="#3b82f6" />
+      <div class="right-panels" aria-label="右侧面板">
+        <section class="panel" aria-label="图层">
+          <div class="panel-header">
+            <span>图层</span>
+            <span class="hint">双击重命名</span>
           </div>
-          <div class="row">
-            <label for="stroke">描边</label>
-            <input id="stroke" type="color" value="#111827" />
-          </div>
-          <div class="row">
-            <label for="strokeWidth">描边宽度</label>
-            <input id="strokeWidth" type="number" min="0" step="1" value="2" />
-          </div>
-          <div class="row">
-            <label for="opacity">透明度</label>
-            <input id="opacity" type="number" min="0" max="1" step="0.05" value="1" />
-          </div>
+          <div class="panel-body" id="layers"></div>
+        </section>
 
-          <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 14px 0" />
+        <section class="panel" aria-label="属性">
+          <div class="panel-header">
+            <span>属性</span>
+            <span class="hint" id="selectionMeta"></span>
+          </div>
+          <div class="panel-body">
+            <div class="row">
+              <label for="fill">填充</label>
+              <input id="fill" type="color" value="#3b82f6" />
+            </div>
+            <div class="row">
+              <label for="stroke">描边</label>
+              <input id="stroke" type="color" value="#111827" />
+            </div>
+            <div class="row">
+              <label for="strokeWidth">描边宽度</label>
+              <input id="strokeWidth" type="number" min="0" step="1" value="2" />
+            </div>
+            <div class="row">
+              <label for="opacity">透明度</label>
+              <input id="opacity" type="number" min="0" max="1" step="0.05" value="1" />
+            </div>
 
-          <div class="row">
-            <label for="text">文本</label>
-            <input id="text" type="text" placeholder="仅对文本对象生效" />
+            <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 14px 0" />
+
+            <div class="row">
+              <label for="text">文本</label>
+              <input id="text" type="text" placeholder="仅对文本对象生效" />
+            </div>
+            <div class="row">
+              <label for="fontSize">字号</label>
+              <input id="fontSize" type="number" min="6" step="1" value="32" />
+            </div>
+            <div class="hint">
+              快捷键： <span class="kbd">⌘Z</span>/<span class="kbd">Ctrl+Z</span> 撤销，
+              <span class="kbd">⌘Y</span>/<span class="kbd">Ctrl+Y</span> 重做， <span class="kbd">⌫</span> 删除，
+              <span class="kbd">⌘C</span>/<span class="kbd">Ctrl+C</span> 复制，
+              <span class="kbd">⌘V</span>/<span class="kbd">Ctrl+V</span>
+              粘贴。
+            </div>
           </div>
-          <div class="row">
-            <label for="fontSize">字号</label>
-            <input id="fontSize" type="number" min="6" step="1" value="32" />
-          </div>
-          <div class="hint">
-            快捷键： <span class="kbd">⌘Z</span>/<span class="kbd">Ctrl+Z</span> 撤销，
-            <span class="kbd">⌘Y</span>/<span class="kbd">Ctrl+Y</span> 重做， <span class="kbd">⌫</span> 删除，
-            <span class="kbd">⌘C</span>/<span class="kbd">Ctrl+C</span> 复制， <span class="kbd">⌘V</span>/<span class="kbd">Ctrl+V</span>
-            粘贴。
-          </div>
-        </div>
-      </section>
+        </section>
+      </div>
     </div>
 
     <dialog id="jsonModal">
