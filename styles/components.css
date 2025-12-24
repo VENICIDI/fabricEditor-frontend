@@ -225,8 +225,38 @@ button.primary {
   cursor: pointer;
 }
 
+ .top-btn-text {
+  display: none;
+ }
+
+ #btnExport,
+ #btnImport {
+  width: auto;
+  padding: 0 10px;
+  gap: 6px;
+  background: #eef2ff;
+  border-color: #c7d2fe;
+ }
+
+ #btnExport .top-btn-text,
+ #btnImport .top-btn-text {
+  display: inline;
+  font-size: 12px;
+  color: #111827;
+ }
+
 .top-btn:hover {
   background: #f3f4f6;
+}
+
+#btnExport:hover,
+#btnImport:hover {
+  background: #e0e7ff;
+}
+
+#btnExport:active,
+#btnImport:active {
+  background: #c7d2fe;
 }
 
 .top-btn:disabled {
