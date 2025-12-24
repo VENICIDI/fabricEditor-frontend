@@ -2,7 +2,7 @@
 
 本仓库为 **纯前端单页** 实现（无构建、无打包），入口为 `editor.html`。
 
-- 使用 CDN 引入 Fabric.js（`window.fabric`）。
+- 使用 CDN 引入 Fabric.js（`window.fabric`）。需要最少6.0版本的fabric，较老的版本很多api通过回调的方式实现，新的版本通过promise，代码结构不同
 - 核心逻辑位于 `src/`（命令模式 undo/redo、工具栏、属性面板、快捷键、序列化等）。
 
 ## 1. 启动方式
