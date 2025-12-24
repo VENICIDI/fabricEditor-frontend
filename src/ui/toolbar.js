@@ -5,7 +5,9 @@ import { exportToJson, importFromJson } from '../core/serializer.js';
 import { Clipboard } from '../core/clipboard.js';
 import { createRect, createCircle, createText, ensureObjectMeta } from '../core/objectFactory.js';
 
+// 左侧工具栏：负责绑定 UI 按钮事件，并将操作转换为命令/画布行为
 export function createToolbar({ canvas, commandManager, jsonModal }) {
+  // 剪贴板封装：提供复制/粘贴（对象克隆与 id 续期）
   const clipboard = new Clipboard();
 
   const btnRect = mustGetEl('btnRect');
@@ -33,6 +35,7 @@ export function createToolbar({ canvas, commandManager, jsonModal }) {
   const brushWidth = mustGetEl('brushWidth');
   const brushOpacity = mustGetEl('brushOpacity');
 
+  // 设置工具按钮的“激活态”（aria-pressed 用于无障碍与样式）
   function setActiveToolButton(activeId) {
     const ids = ['btnSelectMode', 'btnShape', 'btnText', 'btnBrush', 'btnEraser'];
     for (const id of ids) {
@@ -42,11 +45,13 @@ export function createToolbar({ canvas, commandManager, jsonModal }) {
     }
   }
 
+  // 关闭所有弹出面板（形状菜单/画笔设置等）
   function hidePopovers() {
     if (shapeMenu) shapeMenu.hidden = true;
     if (brushMenu) brushMenu.hidden = true;
   }
 
+  // 将 popover 垂直定位到锚点附近（相对工具栏容器）
   function placePopover(popoverEl, anchorEl) {
     if (!popoverEl || !anchorEl) return;
     const tb = anchorEl.closest('.left-toolbar') || anchorEl.parentElement;
@@ -57,6 +62,7 @@ export function createToolbar({ canvas, commandManager, jsonModal }) {
     popoverEl.style.top = `${top}px`;
   }
 
+  // 切换 popover：打开一个会先关闭其它的
   function togglePopover(popoverEl, anchorEl) {
     if (!popoverEl) return;
     const next = !popoverEl.hidden;
@@ -65,6 +71,7 @@ export function createToolbar({ canvas, commandManager, jsonModal }) {
     if (!popoverEl.hidden) placePopover(popoverEl, anchorEl);
   }
 
+  // 打开 popover（并确保其它 popover 关闭）
   function openPopover(popoverEl, anchorEl) {
     if (!popoverEl) return;
     hidePopovers();
@@ -72,6 +79,7 @@ export function createToolbar({ canvas, commandManager, jsonModal }) {
     placePopover(popoverEl, anchorEl);
   }
 
+  // 兼容移动端：长按或右键打开菜单
   function bindLongPressOrContextMenu({ targetEl, onOpen }) {
     if (!targetEl) return;
     let timer = null;
@@ -105,6 +113,7 @@ export function createToolbar({ canvas, commandManager, jsonModal }) {
     });
   }
 
+  // 获取当前选中对象：支持多选（activeSelection）
   function getSelectedTargets() {
     const active = canvas.getActiveObject();
     if (!active) return [];
@@ -112,6 +121,7 @@ export function createToolbar({ canvas, commandManager, jsonModal }) {
     return [active];
   }
 
+  // 将“添加对象”统一包装为命令（便于 undo/redo）
   function addObject(obj) {
     const cmd = new AddObjectCommand({ canvas, obj, select: true });
     commandManager.execute(cmd);
@@ -143,10 +153,12 @@ export function createToolbar({ canvas, commandManager, jsonModal }) {
     });
   }
 
+  // 取绘制控制器：项目里把绘制能力挂在 canvas.__drawing 上
   function getDrawingController() {
     return canvas.__drawing;
   }
 
+  // 从 UI 读取画笔参数（颜色/宽度/透明度）
   function readBrushSettingsFromUi() {
     const color = brushColor.value;
     const width = Number(brushWidth.value);
@@ -158,6 +170,7 @@ export function createToolbar({ canvas, commandManager, jsonModal }) {
     };
   }
 
+  // 将 UI 参数同步到画布绘制控制器
   function syncBrushSettingsToCanvas() {
     const drawing = getDrawingController();
     if (!drawing) return;
@@ -231,6 +244,7 @@ export function createToolbar({ canvas, commandManager, jsonModal }) {
   btnPaste.addEventListener('click', async () => {
     const obj = await clipboard.paste({ canvas });
     if (!obj) return;
+    // 确保新对象带上必要的 meta（id/type 等），便于序列化与命令系统使用
     ensureObjectMeta(obj, obj?.data?.type || obj.type);
     commandManager.execute(new AddObjectCommand({ canvas, obj, select: true }));
   });
@@ -250,6 +264,7 @@ export function createToolbar({ canvas, commandManager, jsonModal }) {
       readOnly: false,
       onConfirm: async (value) => {
         try {
+          // 先清空画布，再加载 JSON，最后清空历史（避免历史与当前状态不一致）
           canvas.clear();
           canvas.setBackgroundColor('#ffffff', () => {});
           await importFromJson({ canvas, jsonString: value });
@@ -263,6 +278,7 @@ export function createToolbar({ canvas, commandManager, jsonModal }) {
     });
   });
 
+  // 根据命令栈状态刷新 undo/redo 按钮可用性
   function refreshButtons() {
     btnUndo.disabled = !commandManager.canUndo();
     btnRedo.disabled = !commandManager.canRedo();

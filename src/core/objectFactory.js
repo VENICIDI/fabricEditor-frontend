@@ -1,13 +1,16 @@
 import { getFabric } from '../fabric/fabricGlobal.js';
 import { createId } from '../utils/id.js';
 
+// 对象工厂：创建常用图形对象，并确保对象携带 data 元信息（id/type）
 export function ensureObjectMeta(obj, type) {
+  // data 用于序列化与命令系统标识对象
   if (!obj.data) obj.data = {};
   if (!obj.data.id) obj.data.id = createId();
   if (!obj.data.type) obj.data.type = type;
   return obj;
 }
 
+// 创建矩形（带默认样式与初始位置）
 export function createRect() {
   const fabric = getFabric();
   const obj = new fabric.Rect({
@@ -23,6 +26,7 @@ export function createRect() {
   return ensureObjectMeta(obj, 'rect');
 }
 
+// 创建圆形（带默认样式与初始位置）
 export function createCircle() {
   const fabric = getFabric();
   const obj = new fabric.Circle({
@@ -37,6 +41,7 @@ export function createCircle() {
   return ensureObjectMeta(obj, 'circle');
 }
 
+// 创建可编辑文本（IText 支持双击编辑）
 export function createText() {
   const fabric = getFabric();
   const obj = new fabric.IText('双击编辑', {
