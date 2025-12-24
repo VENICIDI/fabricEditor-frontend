@@ -161,14 +161,22 @@ export function bindShortcuts({ canvas, commandManager, onDelete, onCopy, onPast
     // 单键切换绘制模式
     if (!mod && !e.altKey && !e.shiftKey && e.key.toLowerCase() === 'b') {
       e.preventDefault();
-      setDrawingMode(!canvas.isDrawingMode);
+
+      // 通过触发 toolbar 按钮点击来切换（保证工具栏高亮同步）
+      if (canvas.isDrawingMode) {
+        document.getElementById('btnSelectMode')?.click();
+      } else {
+        const tool = canvas.__drawing?.getState?.().tool;
+        if (tool === 'eraser') document.getElementById('btnEraser')?.click();
+        else document.getElementById('btnBrush')?.click();
+      }
       return;
     }
 
     // 绘制模式下 Esc 退出
     if (e.key === 'Escape' && canvas.isDrawingMode) {
       e.preventDefault();
-      setDrawingMode(false);
+      document.getElementById('btnSelectMode')?.click();
       return;
     }
 
@@ -196,12 +204,6 @@ export function bindShortcuts({ canvas, commandManager, onDelete, onCopy, onPast
       const shapeBtn = document.getElementById('btnShape');
       if (shapeBtn) shapeBtn.click();
       else document.getElementById('btnRect')?.click();
-      return;
-    }
-
-    if (!mod && !e.altKey && !e.shiftKey && key === 'o') {
-      e.preventDefault();
-      document.getElementById('btnCircle')?.click();
       return;
     }
 
