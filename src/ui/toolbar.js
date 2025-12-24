@@ -3,7 +3,7 @@ import { AddObjectCommand } from '../core/commands/AddObjectCommand.js';
 import { RemoveObjectCommand } from '../core/commands/RemoveObjectCommand.js';
 import { exportToJson, importFromJson } from '../core/serializer.js';
 import { Clipboard } from '../core/clipboard.js';
-import { createRect, createCircle, createPolygon, createText, ensureObjectMeta } from '../core/objectFactory.js';
+import { createRect, createCircle, createText, ensureObjectMeta } from '../core/objectFactory.js';
 
 export function createToolbar({ canvas, commandManager, jsonModal }) {
   const clipboard = new Clipboard();
@@ -11,7 +11,6 @@ export function createToolbar({ canvas, commandManager, jsonModal }) {
   const btnRect = mustGetEl('btnRect');
   const btnCircle = mustGetEl('btnCircle');
   const btnText = mustGetEl('btnText');
-  const btnPolygon = mustGetEl('btnPolygon');
 
   const btnShape = document.getElementById('btnShape');
   const shapeMenu = document.getElementById('shapeMenu');
@@ -126,12 +125,6 @@ export function createToolbar({ canvas, commandManager, jsonModal }) {
 
   btnCircle.addEventListener('click', () => {
     addObject(createCircle());
-    setActiveToolButton(btnShape ? 'btnShape' : 'btnSelectMode');
-    hidePopovers();
-  });
-
-  btnPolygon.addEventListener('click', () => {
-    addObject(createPolygon());
     setActiveToolButton(btnShape ? 'btnShape' : 'btnSelectMode');
     hidePopovers();
   });

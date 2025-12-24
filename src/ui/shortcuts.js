@@ -183,12 +183,6 @@ export function bindShortcuts({ canvas, commandManager, onDelete, onCopy, onPast
       return;
     }
 
-    if (!mod && !e.altKey && !e.shiftKey && key === 'p') {
-      e.preventDefault();
-      document.getElementById('btnPolygon')?.click();
-      return;
-    }
-
     void canvas;
   });
 }
