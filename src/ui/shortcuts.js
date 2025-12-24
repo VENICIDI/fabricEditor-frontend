@@ -98,6 +98,8 @@ export function bindShortcuts({ canvas, commandManager, onDelete, onCopy, onPast
       canvas.selection = false;
       canvas.isDrawingMode = true;
       canvas.defaultCursor = 'crosshair';
+      canvas.freeDrawingCursor = 'crosshair';
+      if (canvas.upperCanvasEl) canvas.upperCanvasEl.style.cursor = 'crosshair';
       canvas.requestRenderAll();
       return;
     }
@@ -105,6 +107,8 @@ export function bindShortcuts({ canvas, commandManager, onDelete, onCopy, onPast
     canvas.isDrawingMode = false;
     canvas.selection = wasSelectionEnabled;
     canvas.defaultCursor = 'default';
+    canvas.freeDrawingCursor = 'default';
+    if (canvas.upperCanvasEl) canvas.upperCanvasEl.style.cursor = 'default';
     canvas.requestRenderAll();
   }
 
