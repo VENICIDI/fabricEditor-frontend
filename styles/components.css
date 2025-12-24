@@ -236,10 +236,10 @@ button.primary {
 
 .row {
   display: grid;
-  grid-template-columns: 110px 1fr;
-  gap: 8px;
+  grid-template-columns: 92px 1fr;
+  gap: 6px;
   align-items: center;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
 }
 
 input[type='text'],
@@ -250,13 +250,13 @@ select {
   box-sizing: border-box;
   border: 1px solid #d1d5db;
   border-radius: 8px;
-  padding: 6px 8px;
-  font-size: 13px;
+  padding: 5px 8px;
+  font-size: 12px;
 }
 
 input[type='color'] {
   width: 44px;
-  height: 30px;
+  height: 28px;
   padding: 0;
   border: 1px solid #d1d5db;
   border-radius: 8px;
@@ -264,7 +264,7 @@ input[type='color'] {
 }
 
 .hint {
-  font-size: 12px;
+  font-size: 11px;
   color: #6b7280;
   line-height: 1.4;
 }
